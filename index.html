@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <base target="_top">
+  <meta charset="UTF-8">
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <style>
+    body { font-family: sans-serif; background: #003d99; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
+    .card { background: white; padding: 40px; border-radius: 15px; box-shadow: 0 10px 25px rgba(0,0,0,0.3); width: 320px; text-align: center; }
+    input { width: 100%; padding: 12px; margin: 10px 0; border: 1px solid #ccc; border-radius: 8px; box-sizing: border-box; }
+    button { width: 100%; padding: 12px; background: #2563eb; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; }
+    .logo { font-size: 24px; font-weight: bold; color: #003d99; margin-bottom: 20px; }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <div class="logo">CMR BRASIL</div>
+    <h2>Horas Extras</h2>
+    <input type="text" id="user" placeholder="Usuário">
+    <input type="password" id="pass" placeholder="Senha">
+    <button id="btnEntrar" onclick="entrar()">Acessar</button>
+  </div>
+
+  <script>
+    // ⚠️ SUBSTITUA PELA SUA URL DE IMPLANTAÇÃO DO GOOGLE
+    const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbyZY7iMrsw5oL7wstMJGoZ-uWI7zZa9uxMLYtvgInlh0RyXbT2bCXPPmGmHSDmRcFhZ/exec";
+
+    function entrar() {
+      const u = document.getElementById('user').value;
+      const p = document.getElementById('pass').value;
+      const btn = document.getElementById('btnEntrar');
+
+      if(!u || !p) return Swal.fire('Erro', 'Preencha todos os campos', 'error');
+      
+      btn.disabled = true;
+      btn.innerText = "Verificando...";
+
+      // Comunicação com o Google Apps Script
+      fetch(WEB_APP_URL, {
+        method: "POST",
+        body: JSON.stringify({ action: "login", user: u, pass: p })
+      })
+      .then(res => res.json())
+      .then(html => {
+        if(html) {
+          document.open();
+          document.write(html);
+          document.close();
+        } else {
+          Swal.fire('Erro', 'Usuário ou senha incorretos!', 'error');
+          btn.disabled = false;
+          btn.innerText = "Acessar";
+        }
+      })
+      .catch(err => {
+        console.error(err);
+        btn.disabled = false;
+        btn.innerText = "Acessar";
+      });
+    }
+  </script>
+</body>
+</html>
