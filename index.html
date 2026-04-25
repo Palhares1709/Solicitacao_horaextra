@@ -1,42 +1,44 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <base target="_top">
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Acesso CMR - Horas Extras</title>
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
   <style>
-    body { font-family: sans-serif; background: #003d99; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
-    .card { background: white; padding: 40px; border-radius: 15px; box-shadow: 0 10px 25px rgba(0,0,0,0.3); width: 320px; text-align: center; }
-    input { width: 100%; padding: 12px; margin: 10px 0; border: 1px solid #ccc; border-radius: 8px; box-sizing: border-box; }
-    button { width: 100%; padding: 12px; background: #2563eb; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; }
-    .logo { font-size: 24px; font-weight: bold; color: #003d99; margin-bottom: 20px; }
+    body { font-family: 'Segoe UI', sans-serif; background: #003d99; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
+    .card { background: white; padding: 40px; border-radius: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.4); width: 340px; text-align: center; }
+    .logo { font-size: 24px; font-weight: bold; color: #003d99; margin-bottom: 5px; }
+    .sub { color: #667; font-size: 14px; margin-bottom: 25px; }
+    input { width: 100%; padding: 12px; margin: 10px 0; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; font-size: 16px; }
+    button { width: 100%; padding: 14px; background: #2563eb; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; font-size: 16px; transition: 0.3s; }
+    button:disabled { background: #ccc; }
   </style>
 </head>
 <body>
   <div class="card">
     <div class="logo">CMR BRASIL</div>
-    <h2>Horas Extras</h2>
+    <div class="sub">Sistema de Horas Extras</div>
     <input type="text" id="user" placeholder="Usuário">
     <input type="password" id="pass" placeholder="Senha">
-    <button id="btnEntrar" onclick="entrar()">Acessar</button>
+    <button id="btn" onclick="entrar()">Entrar</button>
   </div>
 
   <script>
-    // ⚠️ SUBSTITUA PELA SUA URL DE IMPLANTAÇÃO DO GOOGLE
-    const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbyZY7iMrsw5oL7wstMJGoZ-uWI7zZa9uxMLYtvgInlh0RyXbT2bCXPPmGmHSDmRcFhZ/exec";
+    // 1. COLE AQUI SUA URL DE IMPLANTAÇÃO (WEB APP)
+    const URL_GOOGLE = "SUA_URL_DO_GOOGLE_APPS_SCRIPT_AQUI";
 
     function entrar() {
       const u = document.getElementById('user').value;
       const p = document.getElementById('pass').value;
-      const btn = document.getElementById('btnEntrar');
+      const btn = document.getElementById('btn');
 
-      if(!u || !p) return Swal.fire('Erro', 'Preencha todos os campos', 'error');
-      
+      if(!u || !p) return Swal.fire('Atenção', 'Informe usuário e senha', 'warning');
+
       btn.disabled = true;
-      btn.innerText = "Verificando...";
+      btn.innerText = "Autenticando...";
 
-      // Comunicação com o Google Apps Script
-      fetch(WEB_APP_URL, {
+      fetch(URL_GOOGLE, {
         method: "POST",
         body: JSON.stringify({ action: "login", user: u, pass: p })
       })
@@ -47,15 +49,15 @@
           document.write(html);
           document.close();
         } else {
-          Swal.fire('Erro', 'Usuário ou senha incorretos!', 'error');
+          Swal.fire('Erro', 'Usuário ou senha inválidos!', 'error');
           btn.disabled = false;
-          btn.innerText = "Acessar";
+          btn.innerText = "Entrar";
         }
       })
       .catch(err => {
-        console.error(err);
+        Swal.fire('Erro técnico', 'Verifique a URL do Script ou permissões.', 'error');
         btn.disabled = false;
-        btn.innerText = "Acessar";
+        btn.innerText = "Entrar";
       });
     }
   </script>
