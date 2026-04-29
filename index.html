@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html>
+<html lang="pt-br">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -25,7 +25,7 @@
   </div>
 
   <script>
-    // 1. COLE AQUI SUA URL DE IMPLANTAÇÃO (WEB APP)
+    // URL DE IMPLANTAÇÃO DO SEU GOOGLE APPS SCRIPT
     const URL_GOOGLE = "https://script.google.com/macros/s/AKfycbyZY7iMrsw5oL7wstMJGoZ-uWI7zZa9uxMLYtvgInlh0RyXbT2bCXPPmGmHSDmRcFhZ/exec";
 
     function entrar() {
@@ -45,6 +45,7 @@
       .then(res => res.json())
       .then(html => {
         if(html) {
+          // Quando o login é sucesso, o Google envia o HTML do Formuário + a Ponte (Bridge)
           document.open();
           document.write(html);
           document.close();
@@ -55,10 +56,43 @@
         }
       })
       .catch(err => {
-        Swal.fire('Erro técnico', 'Verifique a URL do Script ou permissões.', 'error');
+        Swal.fire('Erro técnico', 'Verifique a conexão ou permissões do script.', 'error');
         btn.disabled = false;
         btn.innerText = "Entrar";
       });
+    }
+
+    /**
+     * Esta função será injetada e chamada pelo formulário após o login.
+     * Ela é responsável por tratar o Base64 que o Google envia e transformar em PDF.
+     */
+    function baixarPDF(obj) {
+      if (!obj.bytes) {
+         Swal.fire('Erro', 'O servidor não enviou os dados do PDF.', 'error');
+         return;
+      }
+
+      try {
+        // CONVERSÃO DE BASE64 PARA BLOB (PDF REAL)
+        const byteCharacters = atob(obj.bytes);
+        const byteNumbers = new Array(byteCharacters.length);
+        for (let i = 0; i < byteCharacters.length; i++) {
+          byteNumbers[i] = byteCharacters.charCodeAt(i);
+        }
+        const byteArray = new Uint8Array(byteNumbers);
+        const blob = new Blob([byteArray], {type: 'application/pdf'});
+        
+        // GERA O LINK DE DOWNLOAD E SIMULA O CLIQUE
+        const link = document.createElement('a');
+        link.href = window.URL.createObjectURL(blob);
+        link.download = obj.nome || "solicitacao.pdf";
+        link.click();
+        
+        Swal.fire('Sucesso!', 'Dados salvos e PDF gerado com sucesso!', 'success');
+      } catch (e) {
+        Swal.fire('Erro no PDF', 'Não foi possível decodificar o arquivo.', 'error');
+        console.error(e);
+      }
     }
   </script>
 </body>
