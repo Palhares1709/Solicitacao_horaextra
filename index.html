@@ -1,99 +1,97 @@
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Acesso CMR - Horas Extras</title>
-  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-  <style>
-    body { font-family: 'Segoe UI', sans-serif; background: #003d99; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
-    .card { background: white; padding: 40px; border-radius: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.4); width: 340px; text-align: center; }
-    .logo { font-size: 24px; font-weight: bold; color: #003d99; margin-bottom: 5px; }
-    .sub { color: #667; font-size: 14px; margin-bottom: 25px; }
-    input { width: 100%; padding: 12px; margin: 10px 0; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; font-size: 16px; }
-    button { width: 100%; padding: 14px; background: #2563eb; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; font-size: 16px; transition: 0.3s; }
-    button:disabled { background: #ccc; }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Acesso CMR - Horas Extras</title>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap');
+        body { font-family: 'Inter', sans-serif; background: #003d99; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
+        .card { background: white; padding: 40px; border-radius: 15px; box-shadow: 0 10px 25px rgba(0,0,0,0.3); width: 320px; text-align: center; }
+        input { width: 100%; padding: 12px; margin: 10px 0; border: 1px solid #ccc; border-radius: 8px; box-sizing: border-box; }
+        button { width: 100%; padding: 12px; background: #2563eb; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; }
+        button:disabled { background: #94a3b8; }
+    </style>
 </head>
 <body>
-  <div class="card">
-    <div class="logo">CMR BRASIL</div>
-    <div class="sub">Sistema de Horas Extras</div>
-    <input type="text" id="user" placeholder="Usuário">
-    <input type="password" id="pass" placeholder="Senha">
-    <button id="btn" onclick="entrar()">Entrar</button>
-  </div>
 
-  <script>
-    // URL DE IMPLANTAÇÃO DO SEU GOOGLE APPS SCRIPT
-    const URL_GOOGLE = "https://script.google.com/macros/s/AKfycbyZY7iMrsw5oL7wstMJGoZ-uWI7zZa9uxMLYtvgInlh0RyXbT2bCXPPmGmHSDmRcFhZ/exec";
+    <div id="conteudo">
+        <div class="card">
+            <h2 style="color:#1e293b; margin-top: 0;">Acesso CMR</h2>
+            <input type="text" id="user" placeholder="Usuário">
+            <input type="password" id="pass" placeholder="Senha">
+            <button id="btnEntrar" onclick="entrar()">Acessar</button>
+        </div>
+    </div>
 
-    function entrar() {
-      const u = document.getElementById('user').value;
-      const p = document.getElementById('pass').value;
-      const btn = document.getElementById('btn');
+    <script>
+        // COLE AQUI O SEU LINK DO GOOGLE (O que você me enviou)
+        const URL_SCRIPT = "https://script.google.com/macros/s/AKfycbyZY7iMrsw5oL7wstMJGoZ-uWI7zZa9uxMLYtvgInlh0RyXbT2bCXPPmGmHSDmRcFhZ/exec";
 
-      if(!u || !p) return Swal.fire('Atenção', 'Informe usuário e senha', 'warning');
+        function entrar() {
+            const u = document.getElementById('user').value;
+            const p = document.getElementById('pass').value;
+            const btn = document.getElementById('btnEntrar');
 
-      btn.disabled = true;
-      btn.innerText = "Autenticando...";
+            if (!u || !p) {
+                Swal.fire('Erro', 'Preencha usuário e senha!', 'error');
+                return;
+            }
 
-      fetch(URL_GOOGLE, {
-        method: "POST",
-        body: JSON.stringify({ action: "login", user: u, pass: p })
-      })
-      .then(res => res.json())
-      .then(html => {
-        if(html) {
-          // Quando o login é sucesso, o Google envia o HTML do Formuário + a Ponte (Bridge)
-          document.open();
-          document.write(html);
-          document.close();
-        } else {
-          Swal.fire('Erro', 'Usuário ou senha inválidos!', 'error');
-          btn.disabled = false;
-          btn.innerText = "Entrar";
+            btn.disabled = true;
+            btn.innerText = "Verificando...";
+
+            // Chama a função checkLogin no Google Apps Script
+            fetch(URL_SCRIPT, {
+                method: "POST",
+                body: JSON.stringify({
+                    action: "login",
+                    user: u,
+                    pass: p
+                })
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data) {
+                    // Se o login for bem-sucedido, o Google retorna o HTML do formulário completo
+                    document.open();
+                    document.write(data);
+                    document.close();
+                } else {
+                    Swal.fire('Erro', 'Usuário ou senha incorretos!', 'error');
+                    btn.disabled = false;
+                    btn.innerText = "Acessar";
+                }
+            })
+            .catch(err => {
+                console.error(err);
+                Swal.fire('Erro técnico', 'Verifique a conexão ou permissões do script.', 'error');
+                btn.disabled = false;
+                btn.innerText = "Acessar";
+            });
         }
-      })
-      .catch(err => {
-        Swal.fire('Erro técnico', 'Verifique a conexão ou permissões do script.', 'error');
-        btn.disabled = false;
-        btn.innerText = "Entrar";
-      });
-    }
 
-    /**
-     * Esta função será injetada e chamada pelo formulário após o login.
-     * Ela é responsável por tratar o Base64 que o Google envia e transformar em PDF.
-     */
-    function baixarPDF(obj) {
-      if (!obj.bytes) {
-         Swal.fire('Erro', 'O servidor não enviou os dados do PDF.', 'error');
-         return;
-      }
-
-      try {
-        // CONVERSÃO DE BASE64 PARA BLOB (PDF REAL)
-        const byteCharacters = atob(obj.bytes);
-        const byteNumbers = new Array(byteCharacters.length);
-        for (let i = 0; i < byteCharacters.length; i++) {
-          byteNumbers[i] = byteCharacters.charCodeAt(i);
+        // Função de ponte para permitir que o formulário carregado fale com o Google
+        function srv(f, args, cb) {
+            fetch(URL_SCRIPT, {
+                method: "POST",
+                body: JSON.stringify({
+                    action: "run",
+                    functionName: f,
+                    parameters: Array.from(args)
+                })
+            })
+            .then(r => r.json())
+            .then(d => {
+                if (d && d.error) {
+                    Swal.fire("Erro no Servidor", d.error, "error");
+                } else if (cb) {
+                    cb(d);
+                }
+            })
+            .catch(e => console.error("Erro na ponte srv:", e));
         }
-        const byteArray = new Uint8Array(byteNumbers);
-        const blob = new Blob([byteArray], {type: 'application/pdf'});
-        
-        // GERA O LINK DE DOWNLOAD E SIMULA O CLIQUE
-        const link = document.createElement('a');
-        link.href = window.URL.createObjectURL(blob);
-        link.download = obj.nome || "solicitacao.pdf";
-        link.click();
-        
-        Swal.fire('Sucesso!', 'Dados salvos e PDF gerado com sucesso!', 'success');
-      } catch (e) {
-        Swal.fire('Erro no PDF', 'Não foi possível decodificar o arquivo.', 'error');
-        console.error(e);
-      }
-    }
-  </script>
+    </script>
 </body>
 </html>
