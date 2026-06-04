@@ -18,33 +18,33 @@
         <input type="password" id="pass" placeholder="Senha">
         <button onclick="entrar()">Acessar</button>
     </div>
-    <script>
-        <script>
-    const URL_SCRIPT = "https://script.google.com/macros/s/AKfycbyZY7iMrsw5oL7wstMJGoZ-uWI7zZa9uxMLYtvgInlh0RyXbT2bCXPPmGmHSDmRcFhZ/exec";
 
-    function entrar() {
-        let u = document.getElementById('user').value, p = document.getElementById('pass').value;
-        
-        fetch(URL_SCRIPT, {
-            method: "POST",
-            body: JSON.stringify({ action: "login", user: u, pass: p })
-        })
-        .then(res => res.text()) // <--- IMPORTANTE: Mude de .json() para .text()
-        .then(res => {
-            // Se o Google Apps Script retornar "false" ou "erro", tratamos aqui
-            if(res !== "false" && res !== "erro") { 
-                document.open(); 
-                document.write(res); // O Google envia o HTML do Formulario aqui
-                document.close(); 
-            } else { 
-                Swal.fire('Erro', 'Usuário ou senha incorretos!', 'error'); 
-            }
-        })
-        .catch(e => {
-            console.error(e);
-            Swal.fire('Erro técnico', 'Verifique a conexão.', 'error');
-        });
-    }
-</script>
+    <script>
+        const URL_SCRIPT = "https://script.google.com/macros/s/AKfycbyZY7iMrsw5oL7wstMJGoZ-uWI7zZa9uxMLYtvgInlh0RyXbT2bCXPPmGmHSDmRcFhZ/exec";
+
+        function entrar() {
+            let u = document.getElementById('user').value;
+            let p = document.getElementById('pass').value;
+            
+            fetch(URL_SCRIPT, {
+                method: "POST",
+                body: JSON.stringify({ action: "login", user: u, pass: p })
+            })
+            .then(res => res.text())
+            .then(res => {
+                if(res.trim() !== "false" && res.trim() !== "erro") { 
+                    document.open(); 
+                    document.write(res); 
+                    document.close(); 
+                } else { 
+                    Swal.fire('Erro', 'Usuário ou senha incorretos!', 'error'); 
+                }
+            })
+            .catch(e => {
+                console.error(e);
+                Swal.fire('Erro técnico', 'Verifique a conexão.', 'error');
+            });
+        }
+    </script>
 </body>
 </html>
