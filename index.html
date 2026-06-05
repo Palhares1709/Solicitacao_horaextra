@@ -32,11 +32,25 @@
             })
             .then(res => res.text())
             .then(res => {
-                if(res.trim() !== "false" && res.trim() !== "erro") { 
+                let resposta = res.trim();
+                
+                // Verifica se o servidor retornou o status de manutenção
+                if (resposta === "MANUTENCAO") {
+                    Swal.fire({
+                        icon: 'warning',
+                        title: 'Sistema em Manutenção',
+                        text: 'Estamos aprimorando nossas ferramentas. Tente novamente mais tarde.',
+                        confirmButtonColor: '#003d99'
+                    });
+                } 
+                // Verifica login bem-sucedido
+                else if(resposta !== "false" && resposta !== "erro") { 
                     document.open(); 
                     document.write(res); 
                     document.close(); 
-                } else { 
+                } 
+                // Erro de credenciais
+                else { 
                     Swal.fire('Erro', 'Usuário ou senha incorretos!', 'error'); 
                 }
             })
